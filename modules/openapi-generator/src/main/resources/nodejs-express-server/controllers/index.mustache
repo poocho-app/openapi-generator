@@ -3,23 +3,11 @@
 {{#operations}}
 {{#operation}}
 {{#-first}}
-const {{classname}}Controller = require('./{{classname}}Controller');
+export * from '#controllers/{{#fnDashize}}{{classname}}{{/fnDashize}}';
 {{/-first}}
 {{/operation}}
 {{/operations}}
 {{/apis}}
 {{/apiInfo}}
 
-module.exports = {
-{{#apiInfo}}
-{{#apis}}
-{{#operations}}
-{{#operation}}
-  {{#-first}}
-  {{classname}}Controller,
-  {{/-first}}
-{{/operation}}
-{{/operations}}
-{{/apis}}
-{{/apiInfo}}
-};
+

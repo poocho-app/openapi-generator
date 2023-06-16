@@ -1,16 +1,29 @@
 {
-  "name":  "{{projectName}}",
-  "version": "{{appVersion}}",
-  "description": "{{{appDescription}}}",
+  "name": "your-backend-api",
+  "version": "1.0.0",
+  "description": "Backed APIs to support Frontend",
   "main": "index.js",
   "scripts": {
     "prestart": "npm install",
-    "start": "node index.js"
+    "start:dev": "npx nodemon",
+    "build": "rimraf ./build && tsc",
+    "start": "npm run build && node build/index.js"
   },
   "keywords": [
     "openapi-generator",
     "openapi"
   ],
+  "imports": {
+    "#root/*": "./build/*.js",
+    "#drivers/*": "./build/drivers/*.js",
+    "#services": "./build/services/index.js",
+    "#services/*": "./build/services/*.js",
+    "#models": "./build/models/index.js",
+    "#models/*": "./build/models/*.js",
+    "#controllers": "./build/controllers/index.js",
+    "#controllers/*": "./build/controllers/*.js"
+  },
+  "type": "module",
   "license": "Unlicense",
   "private": true,
   "dependencies": {
@@ -18,22 +31,34 @@
     "camelcase": "^5.3.1",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.16.4",
-    "express-openapi-validator": "^3.9.1",
-    "js-yaml": "^3.3.0",
+    "express-openapi-validator": "^5.0.4",
+    "http-status": "^1.5.3",
+    "joi": "^17.7.0",
+    "js-yaml": "^3.14.1",
+    "mongoose": "^6.7.2",
+    "morgan": "^1.10.0",
     "ono": "^5.0.1",
     "openapi-sampler": "^1.0.0-beta.15",
     "swagger-ui-express": "^4.0.2",
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "axios": "^0.19.0",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/cors": "^2.8.13",
+    "@types/js-yaml": "^4.0.5",
+    "@types/morgan": "^1.9.4",
+    "@types/node": "^20.2.5",
+    "@types/swagger-ui-express": "^4.1.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.17.2",
-    "mocha": "^7.1.1"
+    "nodemon": "^2.0.22",
+    "rimraf": "^5.0.1",
+    "ts-node": "^10.9.1"
   },
   "eslintConfig": {
     "env": {

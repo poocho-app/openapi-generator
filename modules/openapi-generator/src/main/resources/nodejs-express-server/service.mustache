@@ -1,5 +1,8 @@
-/* eslint-disable no-unused-vars */
-const Service = require('./Service');
+{{>license}}
+import APIError, { WrapError } from '#drivers/api-error';
+import Service, { ServiceResponse } from '#services/service';
+import httpStatus from 'http-status';
+//FIXME: Use types instead of any for all the service level api functions.
 
 {{#operations}}
 {{#operation}}
@@ -21,26 +24,23 @@ const Service = require('./Service');
 * returns {{{.}}}
 {{/returnType}}
 * */
-const {{{operationId}}} = ({{#allParams}}{{#-first}}{ {{/-first}}{{paramName}}{{^-last}}, {{/-last}}{{#-last}} }{{/-last}}{{/allParams}}) => new Promise(
+const {{{operationId}}} = ({{#allParams}}{{#-first}}{ {{/-first}}{{^isBodyParam}}{{paramName}}{{/isBodyParam}}{{#isBodyParam}}body{{/isBodyParam}}{{^-last}}, {{/-last}}{{#-last}} }{{/-last}}{{/allParams}}{{#allParams}}{{#-first}}: { {{/-first}}{{^isBodyParam}}{{paramName}}: any{{/isBodyParam}}{{#isBodyParam}}body: any{{/isBodyParam}}{{^-last}}, {{/-last}}{{#-last}} }{{/-last}}{{/allParams}}): Promise<ServiceResponse> => new Promise(
   async (resolve, reject) => {
     try {
-      resolve(Service.successResponse({
-    {{#allParams}}
-        {{paramName}},
-    {{/allParams}}
-      }));
-    } catch (e) {
-      reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
-      ));
+      resolve(Service.successResponse({}, 200));
+    } catch (err) {
+      let apiErr: APIError = WrapError(
+            'Internal server error',
+            httpStatus.INTERNAL_SERVER_ERROR,
+            <Error>err
+      );
+      reject(apiErr);
     }
-  },
-);
+  });
 {{/operation}}
 {{/operations}}
 
-module.exports = {
+export {
   {{#operations}}
   {{#operation}}
   {{operationId}},
