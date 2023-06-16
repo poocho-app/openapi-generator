@@ -25,6 +25,9 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Info;
+import com.samskivert.mustache.Escapers;
+import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.Template;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
@@ -41,11 +44,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static org.openapitools.codegen.utils.StringUtils.camelize;
+import static org.openapitools.codegen.utils.StringUtils.dashize;
 
 public class NodeJSExpressServerCodegen extends DefaultCodegen implements CodegenConfig {
 
@@ -101,38 +106,61 @@ public class NodeJSExpressServerCodegen extends DefaultCodegen implements Codege
 
         additionalProperties.put("apiVersion", apiVersion);
         additionalProperties.put("implFolder", implFolder);
+        additionalProperties.put("fnDashize", new DashizeLambda());
+        additionalProperties.put("fnTrimDefault", new TrimDefaultsLambda());
+        additionalProperties.put("fnDelIdentifier", new DelIdentifierLambda());
+
 
         // no model file
-        modelTemplateFiles.clear();
+        modelTemplateFiles.put("model.mustache", ".ts");
 
-        apiTemplateFiles.put("controller.mustache", ".js");
-        apiTemplateFiles.put("service.mustache", ".js");
+        apiTemplateFiles.put("controller.mustache", ".ts");
+        apiTemplateFiles.put("service.mustache", ".ts");
 
         supportingFiles.add(new SupportingFile("openapi.mustache", "api", "openapi.yaml"));
-        supportingFiles.add(new SupportingFile("config.mustache", "", "config.js"));
-        supportingFiles.add(new SupportingFile("expressServer.mustache", "", "expressServer.js"));
-        supportingFiles.add(new SupportingFile("index.mustache", "", "index.js"));
-        supportingFiles.add(new SupportingFile("logger.mustache", "", "logger.js"));
+        supportingFiles.add(new SupportingFile("config.mustache", "", "config.ts"));
+        supportingFiles.add(new SupportingFile("server.mustache", "", "server.ts"));
+        supportingFiles.add(new SupportingFile("index.mustache", "", "index.ts"));
         supportingFiles.add(new SupportingFile("eslintrc.mustache", "", ".eslintrc.json"));
-
-        // utils folder
-        supportingFiles.add(new SupportingFile("utils" + File.separator + "openapiRouter.mustache", "utils", "openapiRouter.js"));
+        supportingFiles.add(new SupportingFile("prettierrc.mustache", "", ".prettierrc"));
+        supportingFiles.add(new SupportingFile("prettierignore.mustache", "", ".prettierignore"));
+        supportingFiles.add(new SupportingFile("tsconfig.mustache", "", "tsconfig.json"));
+        supportingFiles.add(new SupportingFile("logger.mustache", "drivers", "logger.ts"));
+        supportingFiles.add(new SupportingFile("morgan.mustache", "drivers", "morgan.ts"));
+        supportingFiles.add(new SupportingFile("api-error.mustache", "drivers", "api-error.ts"));
 
         // controllers folder
-        supportingFiles.add(new SupportingFile("controllers" + File.separator + "index.mustache", "controllers", "index.js"));
-        supportingFiles.add(new SupportingFile("controllers" + File.separator + "Controller.mustache", "controllers", "Controller.js"));
+        supportingFiles.add(new SupportingFile("controllers" + File.separator + "index.mustache", "controllers", "index.ts"));
+        supportingFiles.add(new SupportingFile("controllers" + File.separator + "Controller.mustache", "controllers", "controller.ts"));
         // service folder
-        supportingFiles.add(new SupportingFile("services" + File.separator + "index.mustache", "services", "index.js"));
-        supportingFiles.add(new SupportingFile("services" + File.separator + "Service.mustache", "services", "Service.js"));
+        supportingFiles.add(new SupportingFile("services" + File.separator + "index.mustache", "services", "index.ts"));
+        supportingFiles.add(new SupportingFile("services" + File.separator + "Service.mustache", "services", "service.ts"));
+        // model folder
+        supportingFiles.add(new SupportingFile("models" + File.separator + "index.mustache", "models", "index.ts"));
+        supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "index.mustache", "models/plugins", "index.ts"));
+        supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "paginate.mustache", "models/plugins", "paginate.ts"));
+        supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "to-json.mustache", "models/plugins", "to-json.ts"));
 
         // do not overwrite if the file is already present
         supportingFiles.add(new SupportingFile("package.mustache", "", "package.json")
+                .doNotOverwrite());
+        supportingFiles.add(new SupportingFile("nodemon.mustache", "", "nodemon.json")
                 .doNotOverwrite());
         supportingFiles.add(new SupportingFile("README.mustache", "", "README.md")
                 .doNotOverwrite());
 
         cliOptions.add(new CliOption(SERVER_PORT,
                 "TCP port to listen on."));
+    }
+
+    @Override
+    public String modelPackage() {
+        return "models";
+    }
+
+    @Override
+    public String toModelFilename(String name) {
+        return dashize(name);
     }
 
     @Override
@@ -178,27 +206,29 @@ public class NodeJSExpressServerCodegen extends DefaultCodegen implements Codege
         if (name.length() == 0) {
             return "Default";
         }
-        return camelize(name);
+        return dashize(name);
     }
 
     @Override
     public String toApiFilename(String name) {
-        return toApiName(name) + "Controller";
+        return toApiName(name);
     }
 
     @Override
     public String apiFilename(String templateName, String tag) {
-        String result = super.apiFilename(templateName, tag);
+        //String result = super.apiFilename(templateName, tag);
 
+        String suffix = apiTemplateFiles().get(templateName);
+        String fileFolder = apiFileFolder();
+        String result = fileFolder + File.separator + toApiFilename(tag) + suffix;
         if (templateName.equals("service.mustache")) {
-            String stringToMatch = File.separator + "controllers" + File.separator;
-            String replacement = File.separator + implFolder + File.separator;
-            result = result.replace(stringToMatch, replacement);
-
-            stringToMatch = "Controller.js";
-            replacement = "Service.js";
-            result = result.replace(stringToMatch, replacement);
+            String stringToMatch = File.separator + "controllers";
+            String replacement = File.separator + "services";
+            fileFolder = fileFolder.replace(stringToMatch, replacement);
+            result = fileFolder + File.separator + toApiFilename(tag) + File.separator + "apis" + suffix;
         }
+
+        LOGGER.info("Template Name: " + templateName + " Tag: " + tag + " Result: " + result);
         return result;
     }
 
@@ -452,6 +482,44 @@ public class NodeJSExpressServerCodegen extends DefaultCodegen implements Codege
                 // Restore interrupted state
                 Thread.currentThread().interrupt();
             }
+        }
+    }
+
+    protected static abstract class CustomLambda implements Mustache.Lambda {
+        @Override
+        public void execute(Template.Fragment frag, Writer out) throws IOException {
+            final StringWriter tempWriter = new StringWriter();
+            frag.execute(tempWriter);
+            out.write(formatFragment(tempWriter.toString()));
+        }
+
+        public abstract String formatFragment(String fragment);
+    }
+
+    private static class DashizeLambda extends CustomLambda { 
+        @Override
+        public String formatFragment(String fragment) {
+            return dashize(fragment);
+        }
+    }
+
+    private static class TrimDefaultsLambda extends CustomLambda { 
+        @Override
+        public String formatFragment(String fragment) {
+            if(fragment.equals("default: null") || fragment.equals("default: \"null\"")) {
+                return "";
+            } 
+            return fragment;
+        }
+    }
+
+    private static class DelIdentifierLambda extends CustomLambda { 
+        @Override
+        public String formatFragment(String fragment) {
+            if(fragment.startsWith("id: ") || fragment.startsWith("id?: ")){
+                return "";
+            } 
+            return fragment;
         }
     }
 

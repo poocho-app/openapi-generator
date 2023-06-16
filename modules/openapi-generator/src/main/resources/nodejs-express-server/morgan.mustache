@@ -1,0 +1,21 @@
+import morgan from 'morgan';
+import config from '#root/config';
+import logger from '#drivers/logger';
+
+const getIpFormat = () => (config.NODE_ENV === 'prod' ? ':remote-addr - ' : '');
+const successRespFormat = `${getIpFormat()}:method :url :status - :response-time ms `;
+const errorRespFormat = `${getIpFormat()}:method :url :status - :response-time ms`;
+//FIXME: Figure out how to display the error.message property in morgan error response format.
+//const errorRespFormat = `${getIpFormat()}:method :url :status - :response-time ms - message: :message`;
+
+const successHandler = morgan(successRespFormat, {
+    skip: (req, res) => res.statusCode >= 400,
+    stream: { write: (message) => logger.info(message.trim()) }
+});
+
+const errorHandler = morgan(errorRespFormat, {
+    skip: (req, res) => res.statusCode < 400,
+    stream: { write: (message) => logger.error(message.trim()) }
+});
+
+export { successHandler, errorHandler };

@@ -1,16 +1,59 @@
-const config = require('./config');
-const logger = require('./logger');
-const ExpressServer = require('./expressServer');
+import mongoose from 'mongoose';
+import config from '#root/config';
+import logger from '#drivers/logger';
 
-const launchServer = async () => {
-  try {
-    this.expressServer = new ExpressServer(config.URL_PORT, config.OPENAPI_YAML);
-    this.expressServer.launch();
-    logger.info('Express server running');
-  } catch (error) {
-    logger.error('Express Server failure', error.message);
-    await this.close();
-  }
+import Server from '#root/server';
+
+let server: Server;
+
+const exitHandler = (e: Error) => {
+    logger.error('Exit handler invoked');
+
+    if (!!e) {
+        logger.error(e);
+        logger.error(`Error <${e}>`);
+        logger.error(`Error Stack <${e.stack}>`);
+        logger.error('Express Message', e.message);
+    }
+
+    if (server) {
+        server
+            .close()
+            .catch((e: Error) => {
+                logger.error(`Server close failed ${e}`);
+            })
+            .finally(process.exit(1));
+    }
+
+    process.exit(1);
+    //Fix Me: Close mongodb connection also if it is connected.
 };
 
-launchServer().catch(e => logger.error(e));
+const unexpectedErrorHandler = (e: Error) => {
+    logger.error('Uncaught Exception or Rejection');
+    logger.error(e);
+    //TODO: Check if the exception and the stack are logged properly here.
+    // This is the ultimate and final handler for all unhandled exceptions for the server.
+    // This is most critical to catch and log exceptions and rejections.
+    // If we don't log it properly here, then we will not know what went wrong when the server crashes.
+    exitHandler(e);
+};
+
+process.on('uncaughtException', unexpectedErrorHandler);
+process.on('unhandledRejection', unexpectedErrorHandler);
+process.on('SIGTERM', () => {
+    logger.info('SIGTERM received');
+    exitHandler(Error('SIGTERM received'));
+});
+
+const launchServer = async () => {
+    server = new Server(config.URL_PORT, config.OPENAPI_YAML);
+    server.launch();
+    logger.info('Express server running');
+};
+
+mongoose
+    .connect(config.MONGODB_URL, {})
+    .then(() => logger.info('Connected to MongoDB'))
+    .then(launchServer)
+    .catch((e: Error) => exitHandler(e));

@@ -1,26 +1,33 @@
+{{>license}}
+
 /**
- * The {{{classname}}}Controller file is a very simple one, which does not need to be changed manually,
+* The {{#fnDashize}}{{{classname}}}{{/fnDashize}} controller file is a very simple one, which does not need to be changed manually,
  * unless there's a case where business logic routes the request to an entity which is not
  * the service.
- * The heavy lifting of the Controller item is done in Request.js - that is where request
+ * The heavy lifting of the controller item is done in controller.js - that is where request
  * parameters are extracted and sent to the service, and where response is handled.
  */
 
-const Controller = require('./Controller');
-const service = require('../services/{{{classname}}}Service');
+import Controller from '#controllers/controller';
+import * as service from '#services';
+import { OpenApiRequest } from 'express-openapi-validator/dist/framework/types';
+import { Response } from 'express';
+import logger from '#drivers/logger';
+
 {{#operations}}
 {{#operation}}
-const {{operationId}} = async (request, response) => {
+const {{operationId}} = async (request: OpenApiRequest, response: Response) => {
   await Controller.handleRequest(request, response, service.{{operationId}});
 };
 
 {{/operation}}
 {{/operations}}
 
-module.exports = {
+export {
   {{#operations}}
   {{#operation}}
   {{operationId}},
   {{/operation}}
   {{/operations}}
 };
+
