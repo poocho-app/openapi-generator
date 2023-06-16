@@ -1,0 +1,8 @@
+{{#models}}
+{{#model}}
+{{#vendorExtensions.x-mongo-schema}}
+export * from '#models/{{#fnDashize}}{{classname}}{{/fnDashize}}'
+{{/vendorExtensions.x-mongo-schema}}
+{{/model}}
+{{/models}}
+

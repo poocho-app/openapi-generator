@@ -1,0 +1,80 @@
+{{#models}}
+{{#model}}
+{{#vendorExtensions.x-mongo-schema}}
+{{>license}}
+import mongoose from 'mongoose';
+{{#vars}}
+{{^vendorExtensions.x-mongo-model-ref}}
+{{^isArray}}{{#isModel}}import { {{#lambda.camelcase}}{{datatype}}Schema{{/lambda.camelcase}}, I{{#lambda.pascalcase}}{{datatype}}{{/lambda.pascalcase}}} from '#models/{{#fnDashize}}{{datatype}}{{/fnDashize}}';{{/isModel}}{{/isArray}}  
+{{#isArray}}{{#mostInnerItems}}{{#isModel}}import { {{#lambda.camelcase}}{{datatype}}Schema{{/lambda.camelcase}}, I{{#lambda.pascalcase}}{{datatype}}{{/lambda.pascalcase}}} from '#models/{{#fnDashize}}{{datatype}}{{/fnDashize}}';{{/isModel}}{{/mostInnerItems}}{{/isArray}}  
+{{/vendorExtensions.x-mongo-model-ref}}
+{{/vars}}
+{{#vendorExtensions.x-mongo-model}}
+import { toJSON, paginate } from '#models/plugins/index';
+{{/vendorExtensions.x-mongo-model}}
+
+{{#vars}}{{#isEnum}}export enum {{#lambda.pascalcase}}{{name}}{{/lambda.pascalcase}} {
+{{#_enum}}{{#lambda.uppercase}}{{.}}{{/lambda.uppercase}} = '{{.}}'{{^-last}},{{/-last}}{{/_enum}}
+};{{/isEnum}}{{/vars}}
+
+export interface I{{#lambda.pascalcase}}{{classname}}{{/lambda.pascalcase}} {
+{{#vars}}
+{{#vendorExtensions.x-mongo-model-ref}}
+{{^isArray}}
+    {{name}}{{^required}}?{{/required}}: mongoose.Types.ObjectId;
+{{/isArray}}
+{{#isArray}}
+    {{name}}{{^required}}?{{/required}}: mongoose.Types.ObjectId[];
+{{/isArray}}
+{{/vendorExtensions.x-mongo-model-ref}}
+{{^vendorExtensions.x-mongo-model-ref}}
+{{^isArray}}
+  {{#fnDelIdentifier}}{{name}}{{^required}}?{{/required}}: {{#isModel}}I{{#lambda.pascalcase}}{{datatype}}{{/lambda.pascalcase}}{{/isModel}}{{^isModel}}{{#isNumeric}}number{{/isNumeric}}{{#isDate}}Date{{/isDate}}{{#isString}}string{{/isString}}{{#isBoolean}}boolean{{/isBoolean}}{{#isFreeFormObject}}object{{/isFreeFormObject}}{{/isModel}},{{/fnDelIdentifier}}
+{{/isArray}}
+{{#isArray}}
+  {{name}}{{^required}}?{{/required}}: {{#mostInnerItems}}{{#isModel}}I{{#lambda.pascalcase}}{{datatype}}{{/lambda.pascalcase}}[]{{/isModel}}{{^isModel}}{{#lambda.camelcase}}{{datatype}}{{/lambda.camelcase}}[]{{/isModel}}{{/mostInnerItems}},
+{{/isArray}}
+{{/vendorExtensions.x-mongo-model-ref}}
+{{/vars}}
+};
+
+export const {{#lambda.camelcase}}{{classname}}Schema{{/lambda.camelcase}} = new mongoose.Schema<I{{#lambda.pascalcase}}{{classname}}{{/lambda.pascalcase}}>(
+  {
+    {{#vars}}
+    {{#vendorExtensions.x-mongo-model-ref}}
+    {{^isArray}}
+    {{name}}: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: '{{vendorExtensions.x-mongo-model-ref}}',
+      {{#required}}required: true,{{/required}}
+      {{#fnTrimDefault}}{{#defaultValue}}default: {{#isString}}"{{/isString}}{{defaultValue}}{{#isString}}"{{/isString}}{{/defaultValue}}{{/fnTrimDefault}}
+    },
+    {{/isArray}}
+    {{#isArray}}
+    {{name}}: [{ type: mongoose.Schema.Types.ObjectId, ref: '{{vendorExtensions.x-mongo-model-ref}}' }],
+    {{/isArray}}
+    {{/vendorExtensions.x-mongo-model-ref}}
+    {{^vendorExtensions.x-mongo-model-ref}}
+    {{^isArray}}
+      {{#fnDelIdentifier}}{{name}}: { type: {{#isModel}}{{#lambda.camelcase}}{{datatype}}Schema{{/lambda.camelcase}}{{/isModel}}{{^isModel}}{{#isNumeric}}Number{{/isNumeric}}{{#isDate}}Date{{/isDate}}{{#isUuid}}Schema.Types.ObjectId{{/isUuid}}{{^isUuid}}{{#isString}}String{{/isString}}{{/isUuid}}{{#isBoolean}}Boolean{{/isBoolean}}{{#isFreeFormObject}}Object{{/isFreeFormObject}}{{/isModel}}, {{#isString}}trim: true,{{/isString}} {{#required}}required: true,{{/required}} {{#minimum}}min: {{minimum}},{{/minimum}} {{#maximum}}max: {{maximum}},{{/maximum}} {{#isEnum}}enum: [{{#_enum}}{{#lambda.pascalcase}}{{name}}{{/lambda.pascalcase}}.{{#lambda.uppercase}}{{.}}{{/lambda.uppercase}}{{^-last}},{{/-last}}{{/_enum}}],{{/isEnum}} {{#fnTrimDefault}}{{#defaultValue}}default: {{#isString}}"{{/isString}}{{defaultValue}}{{#isString}}"{{/isString}}{{/defaultValue}}{{/fnTrimDefault}} },{{/fnDelIdentifier}} 
+    {{/isArray}}
+    {{#isArray}}
+    {{name}}: [{{#mostInnerItems}}{{#isModel}}{{#lambda.camelcase}}{{datatype}}Schema{{/lambda.camelcase}}{{/isModel}}{{^isModel}}{{#isUuid}}Schema.Types.ObjectId{{/isUuid}}{{^isUuid}}{{dataType}}{{/isUuid}}{{/isModel}}{{/mostInnerItems}}],
+    {{/isArray}}
+    {{/vendorExtensions.x-mongo-model-ref}}
+    {{/vars}}
+  }{{^vendorExtensions.x-mongo-model}},
+  { _id: false }{{/vendorExtensions.x-mongo-model}}
+);
+
+
+{{#vendorExtensions.x-mongo-model}}
+{{#lambda.camelcase}}{{classname}}Schema{{/lambda.camelcase}}.plugin(toJSON);
+{{#lambda.camelcase}}{{classname}}Schema{{/lambda.camelcase}}.plugin(paginate);
+
+export const {{classname}} = mongoose.model('{{classname}}', {{#lambda.camelcase}}{{classname}}Schema{{/lambda.camelcase}});
+{{/vendorExtensions.x-mongo-model}}
+{{/vendorExtensions.x-mongo-schema}}
+{{/model}}
+{{/models}}
+

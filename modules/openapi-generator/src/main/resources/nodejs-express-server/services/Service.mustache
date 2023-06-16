@@ -1,11 +1,20 @@
-class Service {
-  static rejectResponse(error, code = 500) {
-    return { error, code };
-  }
+import APIError from '#drivers/api-error';
 
-  static successResponse(payload, code = 200) {
-    return { payload, code };
-  }
+export type SuccessResponse = {
+    payload: object;
+    statusCode: number;
+};
+
+
+export type ServiceResponse = APIError | SuccessResponse;
+
+//NOTE: This class is for use by code within services folder only.
+export default class Service {
+    static rejectResponse(error: APIError): APIError {
+        return error;
+    }
+
+    static successResponse(payload: object, statusCode = 200): SuccessResponse {
+        return { payload, statusCode };
+    }
 }
-
-module.exports = Service;

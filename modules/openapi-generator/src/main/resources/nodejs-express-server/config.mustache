@@ -1,15 +1,51 @@
-const path = require('path');
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+import joi from 'joi';
 
-const config = {
-  ROOT_DIR: __dirname,
-  URL_PORT: {{serverPort}}{{^serverPort}}3000{{/serverPort}},
-  URL_PATH: '{{serverHost}}{{^serverHost}}http://localhost{{/serverHost}}',
-  BASE_VERSION: '{{contextPath}}{{^contextPath}}v2{{/contextPath}}',
-  CONTROLLER_DIRECTORY: path.join(__dirname, 'controllers'),
-  PROJECT_DIR: __dirname,
+dotenv.config();
+
+const DEFAULT_ROOT_DIR = process.cwd(); //This is the root directory where index.ts is present
+const DEFAULT_URL_PATH = 'https://api.poocho.co';
+const DEFAULT_URL_PORT: number = 3000;
+const DEFAULT_BASE_VER = '/v1';
+const DEFAULT_PROJ_DIR = DEFAULT_ROOT_DIR;
+const DEFAULT_MONGO_URL = '';
+
+const envVarsSchema = joi
+    .object()
+    .keys({
+        NODE_ENV: joi.string().valid('production', 'development').required(),
+        MONGODB_URL: joi.string().default(DEFAULT_MONGO_URL),
+        ROOT_DIR: joi.string().default(DEFAULT_ROOT_DIR),
+        URL_PORT: joi.number().default(DEFAULT_URL_PORT),
+        URL_PATH: joi.string().default(DEFAULT_URL_PATH),
+        BASE_VERSION: joi.string().default(DEFAULT_BASE_VER),
+        CONTROLLER_DIRECTORY: joi.string().default(path.join(DEFAULT_PROJ_DIR, 'controllers')),
+        OPENAPI_YAML: joi.string().default(path.join(DEFAULT_ROOT_DIR, 'api', 'openapi.yaml')),
+        FULL_PATH: joi
+            .string()
+            .default(`${DEFAULT_URL_PATH}:${DEFAULT_URL_PORT}/${DEFAULT_BASE_VER}`),
+        FILE_UPLOAD_PATH: joi.string().default(path.join(DEFAULT_PROJ_DIR, 'uploaded_files'))
+    })
+    .unknown();
+
+const { value: envVars, error } = envVarsSchema
+    .prefs({ errors: { label: 'key' } })
+    .validate(process.env);
+
+if (error) {
+    throw new Error(`Config validation error: ${error.message}`);
+}
+
+export default {
+    NODE_ENV: envVars.NODE_ENV,
+    MONGODB_URL: envVars.MONGODB_URL,
+    ROOT_DIR: envVars.ROOT_DIR,
+    URL_PORT: envVars.URL_PORT,
+    URL_PATH: envVars.URL_PATH,
+    BASE_VERSION: envVars.BASE_VERSION,
+    CONTROLLER_DIRECTORY: envVars.CONTROLLER_DIRECTORY,
+    OPENAPI_YAML: envVars.OPENAPI_YAML,
+    FULL_PATH: envVars.FULL_PATH,
+    FILE_UPLOAD_PATH: envVars.FILE_UPLOAD_PATH
 };
-config.OPENAPI_YAML = path.join(config.ROOT_DIR, 'api', 'openapi.yaml');
-config.FULL_PATH = `${config.URL_PATH}:${config.URL_PORT}/${config.BASE_VERSION}`;
-config.FILE_UPLOAD_PATH = path.join(config.PROJECT_DIR, 'uploaded_files');
-
-module.exports = config;

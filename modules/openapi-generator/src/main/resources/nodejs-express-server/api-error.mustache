@@ -1,0 +1,62 @@
+import httpStatus, { HttpStatus } from 'http-status';
+
+//FIXME: Use the in-built recursive error wrapping support provided by ES2022 through options parameter.
+// Unable to use that yet since waiting for this fix in typescript: https://github.com/vector-im/element-web/issues/24913
+
+//TODO: Test that toJSON and toString work as expected for error cases.
+export default class APIError extends Error {
+    statusCode: number;
+    cause?: Error;
+
+    constructor(message: string, statusCode?: number, cause?: Error) {
+        super(message);
+        this.cause = cause;
+        this.statusCode = statusCode ?? httpStatus.INTERNAL_SERVER_ERROR;
+    }
+    //toJSON shall be used to return the error details in HTTP response, we don't want to send the stack information.
+    toJSON() {
+        let msg: string = this.message;
+        if (this.cause != undefined) {
+            msg += '[ Cause: ' + this.cause.message + ' ]';
+        }
+        return { statusCode: this.statusCode, message: msg };
+    }
+
+    combinedMessage(): string {
+        let msg: string = this.message;
+        if (this.cause != undefined) {
+            msg += '[ Cause: ' + this.cause.message + ' ]';
+        }
+
+        return msg;
+    }
+
+    //toString shall be used to print the error details in the logfiles so, we would like to dump the entire stack trace there.
+    toString() {
+        let toStr: string;
+        toStr = 'Error: ' + this.message + '\n';
+        toStr += 'Code: ' + this.statusCode + '\n';
+        toStr += 'Stack: ' + '\n';
+        toStr += this.stack + '\n';
+        toStr += '-------------------------------------- \n';
+        toStr += 'Cauase: \n';
+        toStr += 'Error: ' + this.cause?.message + '\n';
+        toStr += 'Code: ' + this.cause?.message + '\n';
+        toStr += 'Stack: ' + '\n';
+        toStr += this.stack + '\n';
+        toStr += '-------------------------------------- \n';
+    }
+}
+
+//If the input err is an APIError then it returns the object unaltered.
+//Else it wraps the 'Error' object usign the message and status code provieded as APIError.
+export function WrapError(message: string, statusCode: number, err: Error | APIError) {
+    let apiErr: APIError;
+    if (err instanceof APIError) {
+        apiErr = err;
+    } else {
+        apiErr = new APIError(message, statusCode, err);
+    }
+
+    return apiErr;
+}
