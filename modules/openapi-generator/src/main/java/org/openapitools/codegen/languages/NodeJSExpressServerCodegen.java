@@ -118,6 +118,7 @@ public class NodeJSExpressServerCodegen extends DefaultCodegen implements Codege
         apiTemplateFiles.put("service.mustache", ".ts");
 
         supportingFiles.add(new SupportingFile("openapi.mustache", "api", "openapi.yaml"));
+        supportingFiles.add(new SupportingFile("modeldocs.mustache", "docs/model.puml"));
         supportingFiles.add(new SupportingFile("config.mustache", "", "config.ts"));
         supportingFiles.add(new SupportingFile("server.mustache", "", "server.ts"));
         supportingFiles.add(new SupportingFile("index.mustache", "", "index.ts"));
@@ -137,6 +138,7 @@ public class NodeJSExpressServerCodegen extends DefaultCodegen implements Codege
         supportingFiles.add(new SupportingFile("services" + File.separator + "Service.mustache", "services", "service.ts"));
         // model folder
         supportingFiles.add(new SupportingFile("models" + File.separator + "index.mustache", "models", "index.ts"));
+        supportingFiles.add(new SupportingFile("enums.mustache", "models", "enums.ts"));
         supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "index.mustache", "models/plugins", "index.ts"));
         supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "paginate.mustache", "models/plugins", "paginate.ts"));
         supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "to-json.mustache", "models/plugins", "to-json.ts"));
