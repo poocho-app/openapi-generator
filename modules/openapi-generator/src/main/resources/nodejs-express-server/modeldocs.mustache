@@ -1,0 +1,40 @@
+@startuml
+{{#models}}{{#model}}
+{{#vendorExtensions.x-mongo-schema}}
+object {{name}} {
+{{#vars}}
+    {{name}}
+{{/vars}}
+}
+{{/vendorExtensions.x-mongo-schema}}
+{{/model}}{{/models}}
+
+{{#models}}{{#model}}
+{{#vendorExtensions.x-mongo-schema}}
+{{#vars}}
+{{^vendorExtensions.x-mongo-model-ref}}
+{{#isArray}} {{#mostInnerItems}}
+    {{#isModel}}
+        {{classname}}::{{name}} "1" *-- "*"{{datatype}} 
+    {{/isModel}}
+{{/mostInnerItems}} {{/isArray}}
+{{^isArray}}
+    {{#isModel}}
+        {{classname}}::{{name}} *-- {{datatype}} 
+    {{/isModel}}
+{{/isArray}}
+{{/vendorExtensions.x-mongo-model-ref}}
+{{#vendorExtensions.x-mongo-model-ref}}
+{{#isArray}} {{#mostInnerItems}}
+   {{classname}}::{{name}} "1" --> "*"{{vendorExtensions.x-mongo-model-ref}} 
+{{/mostInnerItems}} {{/isArray}}
+{{^isArray}}
+   {{classname}}::{{name}} --> {{vendorExtensions.x-mongo-model-ref}} 
+{{/isArray}}
+{{/vendorExtensions.x-mongo-model-ref}}
+{{/vars}}
+{{/vendorExtensions.x-mongo-schema}}
+{{/model}}{{/models}}
+
+
+@enduml

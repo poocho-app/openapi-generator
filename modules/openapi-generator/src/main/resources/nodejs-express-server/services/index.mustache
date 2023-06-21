@@ -1,7 +1,12 @@
-export * from '#services/activity/apis';
-export * from '#services/campaign/apis';
-export * from '#services/company/apis';
-export * from '#services/media/apis';
-export * from '#services/meta/apis';
-export * from '#services/user/apis';
+{{#apiInfo}}
+{{#apis}}
+{{#operations}}
+{{#operation}}
+{{#-first}}
+export * from '#services/{{#fnDashize}}{{classname}}{{/fnDashize}}/apis';
+{{/-first}}
+{{/operation}}
+{{/operations}}
+{{/apis}}
+{{/apiInfo}}
 export { ServiceResponse, SuccessResponse } from '#services/service';

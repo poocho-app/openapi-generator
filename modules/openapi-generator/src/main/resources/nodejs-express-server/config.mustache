@@ -22,6 +22,7 @@ const envVarsSchema = joi
         BASE_VERSION: joi.string().default(DEFAULT_BASE_VER),
         CONTROLLER_DIRECTORY: joi.string().default(path.join(DEFAULT_PROJ_DIR, 'controllers')),
         OPENAPI_YAML: joi.string().default(path.join(DEFAULT_ROOT_DIR, 'api', 'openapi.yaml')),
+        MODEL_PNG: joi.string().default(path.join(DEFAULT_ROOT_DIR, 'docs', 'model.png')),
         FULL_PATH: joi
             .string()
             .default(`${DEFAULT_URL_PATH}:${DEFAULT_URL_PORT}/${DEFAULT_BASE_VER}`),
@@ -46,6 +47,7 @@ export default {
     BASE_VERSION: envVars.BASE_VERSION,
     CONTROLLER_DIRECTORY: envVars.CONTROLLER_DIRECTORY,
     OPENAPI_YAML: envVars.OPENAPI_YAML,
+    MODEL_PNG: envVars.MODEL_PNG,
     FULL_PATH: envVars.FULL_PATH,
     FILE_UPLOAD_PATH: envVars.FILE_UPLOAD_PATH
 };
