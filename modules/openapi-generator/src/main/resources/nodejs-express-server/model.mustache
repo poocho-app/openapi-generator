@@ -33,7 +33,7 @@ export interface I{{#lambda.pascalcase}}{{classname}}{{/lambda.pascalcase}} {
   {{#fnDelIdentifier}}{{name}}?: {{#isModel}}I{{#lambda.pascalcase}}{{datatype}}{{/lambda.pascalcase}}{{/isModel}}{{^isModel}}{{#isNumeric}}number{{/isNumeric}}{{#isDate}}Date{{/isDate}}{{#isString}}string{{/isString}}{{#isBoolean}}boolean{{/isBoolean}}{{#isFreeFormObject}}object{{/isFreeFormObject}}{{#isEnumRef}}{{^isString}}string{{/isString}}{{/isEnumRef}}{{/isModel}},{{/fnDelIdentifier}}
 {{/isArray}}
 {{#isArray}}
-  {{name}}?: {{#mostInnerItems}}{{#isModel}}I{{#lambda.pascalcase}}{{datatype}}{{/lambda.pascalcase}}[]{{/isModel}}{{^isModel}}{{#isEnumRef}}string{{/isEnumRef}}{{^isEnumRef}}{{#lambda.camelcase}}{{datatype}}{{/lambda.camelcase}}{{/isEnumRef}}{{/isModel}}[]{{/mostInnerItems}},
+  {{name}}?: {{#mostInnerItems}}{{#isModel}}I{{#lambda.pascalcase}}{{datatype}}{{/lambda.pascalcase}}{{/isModel}}{{^isModel}}{{#isEnumRef}}string{{/isEnumRef}}{{^isEnumRef}}{{#lambda.camelcase}}{{datatype}}{{/lambda.camelcase}}{{/isEnumRef}}{{/isModel}}[]{{/mostInnerItems}},
 {{/isArray}}
 {{/vendorExtensions.x-mongo-model-ref}}
 {{/vars}}
