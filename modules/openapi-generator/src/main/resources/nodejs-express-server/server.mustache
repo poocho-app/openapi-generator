@@ -93,13 +93,9 @@ export default class Server {
         // that was not already caught by the controller.
         //Error Handler
         this.app.use((err: Error, req: any, res: any, next: any) => {
-            let apiErr: APIError = WrapError(
-                'Internal Server Error',
-                httpStatus.INTERNAL_SERVER_ERROR,
-                err
-            );
+            let apiErr: APIError = WrapError(err);
             logger.error('Exception: ', apiErr);
-            res.status(apiErr.statusCode).send(apiErr.combinedMessage());
+            res.status(apiErr.statusCode).send({ message: apiErr.combinedMessage() });
         });
 
         /* End of Default error handlers */

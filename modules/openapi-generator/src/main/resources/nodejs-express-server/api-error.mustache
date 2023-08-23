@@ -50,7 +50,10 @@ export default class APIError extends Error {
 
 //If the input err is an APIError then it returns the object unaltered.
 //Else it wraps the 'Error' object usign the message and status code provieded as APIError.
-export function WrapError(message: string, statusCode: number, err: Error | APIError) {
+export function WrapError(err: Error | APIError, message?: string, statusCode?: number) {
+    message = message ?? 'Internal server error';
+    statusCode = statusCode ?? httpStatus.INTERNAL_SERVER_ERROR;
+
     let apiErr: APIError;
     if (err instanceof APIError) {
         apiErr = err;
@@ -60,3 +63,4 @@ export function WrapError(message: string, statusCode: number, err: Error | APIE
 
     return apiErr;
 }
+

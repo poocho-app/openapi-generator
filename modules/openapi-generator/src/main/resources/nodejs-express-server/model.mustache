@@ -48,6 +48,7 @@ export const {{#lambda.camelcase}}{{classname}}Schema{{/lambda.camelcase}} = new
       type: mongoose.Schema.Types.ObjectId,
       ref: '{{vendorExtensions.x-mongo-model-ref}}',
       {{#vendorExtensions.x-mongo-required}}required: true,{{/vendorExtensions.x-mongo-required}}
+      {{#vendorExtensions.x-mongo-unique}}unique: true,{{/vendorExtensions.x-mongo-unique}}
     },
     {{/isArray}}
     {{#isArray}}
@@ -56,7 +57,7 @@ export const {{#lambda.camelcase}}{{classname}}Schema{{/lambda.camelcase}} = new
     {{/vendorExtensions.x-mongo-model-ref}}
     {{^vendorExtensions.x-mongo-model-ref}}
     {{^isArray}}
-      {{#fnDelIdentifier}}{{name}}: { type: {{#isModel}}{{#lambda.camelcase}}{{datatype}}Schema{{/lambda.camelcase}}{{/isModel}}{{^isModel}}{{#isNumeric}}Number{{/isNumeric}}{{#isDate}}Date{{/isDate}}{{#isUuid}}Schema.Types.ObjectId{{/isUuid}}{{^isUuid}}{{#isString}}String{{/isString}}{{/isUuid}}{{#isBoolean}}Boolean{{/isBoolean}}{{#isFreeFormObject}}Object{{/isFreeFormObject}}{{#isEnumRef}}{{^isString}}String{{/isString}}{{/isEnumRef}}{{/isModel}}, {{#isString}}trim: true,{{/isString}} {{#vendorExtensions.x-mongo-required}}required: true,{{/vendorExtensions.x-mongo-required}} {{#minimum}}min: {{minimum}},{{/minimum}} {{#maximum}}max: {{maximum}},{{/maximum}} {{#isEnumRef}}enum: [{{#allowableValues}}{{#values}}{{#isEnum}}{{classname}}{{#lambda.pascalcase}}{{name}}{{/lambda.pascalcase}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}.{{#lambda.uppercase}}{{.}}{{/lambda.uppercase}}{{^-last}},{{/-last}}{{/values}}{{/allowableValues}}],{{/isEnumRef}} },{{/fnDelIdentifier}} 
+      {{#fnDelIdentifier}}{{name}}: { type: {{#isModel}}{{#lambda.camelcase}}{{datatype}}Schema{{/lambda.camelcase}}{{/isModel}}{{^isModel}}{{#isNumeric}}Number{{/isNumeric}}{{#isDate}}Date{{/isDate}}{{#isUuid}}Schema.Types.ObjectId{{/isUuid}}{{^isUuid}}{{#isString}}String{{/isString}}{{/isUuid}}{{#isBoolean}}Boolean{{/isBoolean}}{{#isFreeFormObject}}Object{{/isFreeFormObject}}{{#isEnumRef}}{{^isString}}String{{/isString}}{{/isEnumRef}}{{/isModel}}, {{#isString}}trim: true,{{/isString}} {{#vendorExtensions.x-mongo-required}}required: true,{{/vendorExtensions.x-mongo-required}} {{#vendorExtensions.x-mongo-unique}}unique: true,{{/vendorExtensions.x-mongo-unique}} {{#minimum}}min: {{minimum}},{{/minimum}} {{#maximum}}max: {{maximum}},{{/maximum}} {{#isEnumRef}}enum: [{{#allowableValues}}{{#values}}{{#isEnum}}{{classname}}{{#lambda.pascalcase}}{{name}}{{/lambda.pascalcase}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}.{{#lambda.uppercase}}{{.}}{{/lambda.uppercase}}{{^-last}},{{/-last}}{{/values}}{{/allowableValues}}],{{/isEnumRef}} },{{/fnDelIdentifier}} 
     {{/isArray}}
     {{#isArray}}
       {{name}}: [{{#mostInnerItems}}{{#isModel}}{{#lambda.camelcase}}{{datatype}}Schema{{/lambda.camelcase}}{{/isModel}}{{^isModel}}{{#isUuid}}Schema.Types.ObjectId{{/isUuid}}{{^isUuid}}{{#isEnumRef}} {type: String, enum: [ {{#allowableValues}}{{#values}}{{#isEnum}}{{classname}}{{#lambda.pascalcase}}{{name}}{{/lambda.pascalcase}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}.{{#lambda.uppercase}}{{.}}{{/lambda.uppercase}}{{^-last}},{{/-last}}{{/values}}{{/allowableValues}} ] } {{/isEnumRef}}{{^isEnumRef}}{{dataType}}{{/isEnumRef}}{{/isUuid}}{{/isModel}}{{/mostInnerItems}}],
