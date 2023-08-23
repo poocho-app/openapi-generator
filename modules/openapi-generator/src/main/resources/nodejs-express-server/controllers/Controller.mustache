@@ -25,11 +25,7 @@ export default class Controller {
     }
 
    static sendError(response: any, error: APIError | Error) {
-        let apiErr: APIError = WrapError(
-            'Internal Server Error',
-            httpStatus.INTERNAL_SERVER_ERROR,
-            error
-        );
+        let apiErr: APIError = WrapError(error);
         logger.error(apiErr);
         response.status(apiErr.statusCode);
         response.json(apiErr);
