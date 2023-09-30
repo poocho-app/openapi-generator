@@ -117,31 +117,36 @@ public class NodeJSExpressServerCodegen extends DefaultCodegen implements Codege
         apiTemplateFiles.put("controller.mustache", ".ts");
         apiTemplateFiles.put("service.mustache", ".ts");
 
-        supportingFiles.add(new SupportingFile("openapi.mustache", "api", "openapi.yaml"));
-        supportingFiles.add(new SupportingFile("modeldocs.mustache", "docs/model.puml"));
-        supportingFiles.add(new SupportingFile("config.mustache", "", "config.ts"));
-        supportingFiles.add(new SupportingFile("server.mustache", "", "server.ts"));
-        supportingFiles.add(new SupportingFile("index.mustache", "", "index.ts"));
+
+        String serverType = System.getenv("SERVER_TYPE");
+        if (StringUtils.isEmpty(serverType)) {
+            serverType = "apiserver";
+        }
+        supportingFiles.add(new SupportingFile("openapi.mustache", serverType, "api/openapi.yaml"));
+        supportingFiles.add(new SupportingFile("modeldocs.mustache", "lib/docs/model.puml"));
+        supportingFiles.add(new SupportingFile("config.mustache", "", "lib/config.ts"));
+        supportingFiles.add(new SupportingFile("server.mustache", serverType, "server.ts"));
+        supportingFiles.add(new SupportingFile("index.mustache", serverType, "index.ts"));
         supportingFiles.add(new SupportingFile("eslintrc.mustache", "", ".eslintrc.json"));
         supportingFiles.add(new SupportingFile("prettierrc.mustache", "", ".prettierrc"));
         supportingFiles.add(new SupportingFile("prettierignore.mustache", "", ".prettierignore"));
         supportingFiles.add(new SupportingFile("tsconfig.mustache", "", "tsconfig.json"));
-        supportingFiles.add(new SupportingFile("logger.mustache", "drivers", "logger.ts"));
-        supportingFiles.add(new SupportingFile("morgan.mustache", "drivers", "morgan.ts"));
-        supportingFiles.add(new SupportingFile("api-error.mustache", "drivers", "api-error.ts"));
+        supportingFiles.add(new SupportingFile("logger.mustache", "lib/drivers", "logger.ts"));
+        supportingFiles.add(new SupportingFile("morgan.mustache", "lib/drivers", "morgan.ts"));
+        supportingFiles.add(new SupportingFile("api-error.mustache", "lib/drivers", "api-error.ts"));
 
         // controllers folder
-        supportingFiles.add(new SupportingFile("controllers" + File.separator + "index.mustache", "controllers", "index.ts"));
-        supportingFiles.add(new SupportingFile("controllers" + File.separator + "Controller.mustache", "controllers", "controller.ts"));
+        supportingFiles.add(new SupportingFile("controllers" + File.separator + "index.mustache", serverType + File.separator + "controllers", "index.ts"));
+        supportingFiles.add(new SupportingFile("controllers" + File.separator + "Controller.mustache", serverType + File.separator + "controllers", "controller.ts"));
         // service folder
-        supportingFiles.add(new SupportingFile("services" + File.separator + "index.mustache", "services", "index.ts"));
-        supportingFiles.add(new SupportingFile("services" + File.separator + "Service.mustache", "services", "service.ts"));
+        supportingFiles.add(new SupportingFile("services" + File.separator + "index.mustache", serverType + File.separator + "services", "index.ts"));
+        supportingFiles.add(new SupportingFile("services" + File.separator + "Service.mustache", serverType + File.separator + "services", "service.ts"));
         // model folder
-        supportingFiles.add(new SupportingFile("models" + File.separator + "index.mustache", "models", "index.ts"));
-        supportingFiles.add(new SupportingFile("enums.mustache", "models", "enums.ts"));
-        supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "index.mustache", "models/plugins", "index.ts"));
-        supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "paginate.mustache", "models/plugins", "paginate.ts"));
-        supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "to-json.mustache", "models/plugins", "to-json.ts"));
+        supportingFiles.add(new SupportingFile("models" + File.separator + "index.mustache", "lib/models", "index.ts"));
+        supportingFiles.add(new SupportingFile("enums.mustache", "lib/models", "enums.ts"));
+        supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "index.mustache", "lib/models/plugins", "index.ts"));
+        supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "paginate.mustache", "lib/models/plugins", "paginate.ts"));
+        supportingFiles.add(new SupportingFile("models" + File.separator + "plugins" + File.separator + "to-json.mustache", "lib/models/plugins", "to-json.ts"));
 
         // do not overwrite if the file is already present
         supportingFiles.add(new SupportingFile("package.mustache", "", "package.json")
@@ -157,7 +162,7 @@ public class NodeJSExpressServerCodegen extends DefaultCodegen implements Codege
 
     @Override
     public String modelPackage() {
-        return "models";
+        return "lib/models";
     }
 
     @Override
@@ -167,7 +172,11 @@ public class NodeJSExpressServerCodegen extends DefaultCodegen implements Codege
 
     @Override
     public String apiPackage() {
-        return "controllers";
+        String serverType = System.getenv("SERVER_TYPE");
+        if (StringUtils.isEmpty(serverType)) {
+            serverType = "apiserver";
+        }
+        return serverType + File.separator + "controllers";
     }
 
     /**
@@ -219,6 +228,7 @@ public class NodeJSExpressServerCodegen extends DefaultCodegen implements Codege
     @Override
     public String apiFilename(String templateName, String tag) {
         //String result = super.apiFilename(templateName, tag);
+        //
 
         String suffix = apiTemplateFiles().get(templateName);
         String fileFolder = apiFileFolder();
