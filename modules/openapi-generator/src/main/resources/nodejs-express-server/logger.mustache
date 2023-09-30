@@ -1,5 +1,5 @@
 import { transports, createLogger, format } from 'winston';
-import config from '#root/config';
+import config from '#config';
 
 /*
 const enumerateErrorFormat = format((info) => {
@@ -11,7 +11,7 @@ const enumerateErrorFormat = format((info) => {
 */
 
 const logger = createLogger({
-    level: config.NODE_ENV === 'dev' ? 'debug' : 'info',
+    level: config.NODE_ENV === 'development' ? 'debug' : 'info',
     format: format.combine(
         //enumerateErrorFormat(),
         //config.NODE_ENV === 'development' ? format.colorize(): winston.format.uncolorize(),
