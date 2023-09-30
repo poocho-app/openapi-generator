@@ -1,5 +1,5 @@
 import morgan from 'morgan';
-import config from '#root/config';
+import config from '#config';
 import logger from '#drivers/logger';
 
 const getIpFormat = () => (config.NODE_ENV === 'prod' ? ':remote-addr - ' : '');
