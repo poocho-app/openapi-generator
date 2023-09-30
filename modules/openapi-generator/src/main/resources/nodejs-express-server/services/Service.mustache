@@ -1,7 +1,7 @@
 import APIError from '#drivers/api-error';
 
 export type SuccessResponse = {
-    payload: object;
+    payload: object | undefined;
     statusCode: number;
 };
 
@@ -14,7 +14,7 @@ export default class Service {
         return error;
     }
 
-    static successResponse(payload: object, statusCode = 200): SuccessResponse {
+    static successResponse(payload: object | undefined, statusCode = 200): SuccessResponse {
         return { payload, statusCode };
     }
 }

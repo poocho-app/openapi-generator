@@ -3,10 +3,10 @@
 {{#operations}}
 {{#operation}}
 {{#-first}}
-export * from '#services/{{#fnDashize}}{{classname}}{{/fnDashize}}/apis';
+export * from '#apiserver/services/{{#fnDashize}}{{classname}}{{/fnDashize}}/apis';
 {{/-first}}
 {{/operation}}
 {{/operations}}
 {{/apis}}
 {{/apiInfo}}
-export { ServiceResponse, SuccessResponse } from '#services/service';
+export { ServiceResponse, SuccessResponse } from '#apiserver/services/service';
