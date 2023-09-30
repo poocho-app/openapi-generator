@@ -8,11 +8,10 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import * as OpenApiValidator from 'express-openapi-validator';
 import logger from '#drivers/logger';
-import config from '#root/config';
-import * as httpStatus from 'http-status';
+import config from '#config';
 import * as morgan from '#drivers/morgan';
 import APIError, { WrapError } from '#drivers/api-error';
-import * as controllerHandlers from '#controllers';
+import * as controllerHandlers from '#apicontrollers';
 import { OpenAPIV3, OperationHandlerOptions } from 'express-openapi-validator/dist/framework/types';
 import { RouteMetadata } from 'express-openapi-validator/dist/framework/openapi.spec.loader';
 
@@ -84,9 +83,7 @@ export default class Server {
             validateResponses: config.NODE_ENV === 'development' ? true : false //Always validate requests, but validate responses only in development.
         });
         this.app.use(validator);
-    }
 
-    launch() {
         // TODO: If controller handles the errors and processes them  in sendError,
         // will the error handlers be called in the middleware? Must check this later on.
         // Regardless, we'll have these error handlers here  as a fail safe to handle something
@@ -97,8 +94,10 @@ export default class Server {
             logger.error('Exception: ', apiErr);
             res.status(apiErr.statusCode).send({ message: apiErr.combinedMessage() });
         });
-
         /* End of Default error handlers */
+    }
+
+    launch() {
         this.server = http.createServer(this.app).listen(this.port);
         console.log(`Listening on port ${this.port}`);
     }
