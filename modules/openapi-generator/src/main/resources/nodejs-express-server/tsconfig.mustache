@@ -12,7 +12,9 @@
 
     /* Language and Environment */
     "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-    // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
+    "lib": [
+        "ES2021.String"
+    ] /* Specify a set of bundled library declaration files that describe the target runtime environment. */,
     // "jsx": "preserve",                                /* Specify what JSX code is generated. */
     // "experimentalDecorators": true,                   /* Enable experimental support for legacy experimental decorators. */
     // "emitDecoratorMetadata": true,                    /* Emit design-type metadata for decorated declarations in source files. */
@@ -31,13 +33,14 @@
     "baseUrl": "./" /* Specify the base directory to resolve non-relative module names. */,
     "paths": {
       "#root/*": ["./*"],
-      "#drivers/*": ["./drivers/*"],
-      "#services": ["./services/index.js"],
-      "#services/*": ["./services/*"],
-      "#models": ["./models/index.js"],
-      "#models/*": ["./models/*"],
-      "#controllers": ["./controllers/index.js"],
-      "#controllers/*": ["./controllers/*"]
+      "#lib/*": ["lib/*"],
+      "#config": ["lib/config.js"],
+      "#drivers/*": ["lib/drivers/*"],
+      "#models": ["lib/models/index.js"],
+      "#models/*": ["lib/models/*"],
+      "#apiserver/*": ["apiserver/*"],
+      "#apiservices": ["apiserver/services/index.js"],
+      "#apicontrollers": ["apiserver/controllers/index.js"]
     } /* Specify a set of entries that re-map imports to additional lookup locations. */,
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
@@ -115,5 +118,9 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "./coverage", "jest.config.js"],
+  "ts-node": {
+      "transpileOnly": true,
+      "files": true
+  }
 }

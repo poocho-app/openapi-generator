@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import config from '#root/config';
+import config from '#config';
 import logger from '#drivers/logger';
-import { ServiceResponse, SuccessResponse } from '#services';
+import { ServiceResponse, SuccessResponse } from '#apiservices';
 import { Response } from 'express';
 import { OpenApiRequest } from 'express-openapi-validator/dist/framework/types';
 import APIError, { WrapError } from '#drivers/api-error';
@@ -24,7 +24,7 @@ export default class Controller {
         }
     }
 
-   static sendError(response: any, error: APIError | Error) {
+    static sendError(response: any, error: APIError | Error) {
         let apiErr: APIError = WrapError(error);
         logger.error(apiErr);
         response.status(apiErr.statusCode);
@@ -79,7 +79,7 @@ export default class Controller {
 
     static collectRequestParams(request: any) {
         logger.debug('----- Request -----');
-        logger.debug(request);
+        //logger.debug(request);
         logger.debug('---- End of Request ----');
         const requestParams: { [key: string]: any } = {};
 

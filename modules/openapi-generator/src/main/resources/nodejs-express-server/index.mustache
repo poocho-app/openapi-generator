@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
-import config from '#root/config';
+import config from '#config';
 import logger from '#drivers/logger';
 
-import Server from '#root/server';
+import Server from '#apiserver/server';
 
 let server: Server;
 
@@ -47,7 +47,7 @@ process.on('SIGTERM', () => {
 });
 
 const launchServer = async () => {
-    server = new Server(config.URL_PORT, config.OPENAPI_YAML);
+    server = new Server(config.URL_PORT, './apiserver/api/openapi.yaml');
     server.launch();
     logger.info('Express server running');
 };

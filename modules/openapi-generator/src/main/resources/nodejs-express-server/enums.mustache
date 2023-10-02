@@ -1,9 +1,9 @@
 {{>license}}
 {{#models}}
 {{#model}}
-{{#vars}}{{#isEnumRef}}{{^isEnum}}export enum {{#lambda.pascalcase}}{{name}}{{/lambda.pascalcase}} {
+{{#isEnum}} export enum {{#lambda.pascalcase}}{{name}}{{/lambda.pascalcase}} {
 {{#allowableValues}}{{#values}}{{#lambda.uppercase}}{{.}}{{/lambda.uppercase}} = '{{.}}'{{^-last}},{{/-last}}{{/values}}{{/allowableValues}}
-};{{/isEnum}}{{/isEnumRef}}{{/vars}}
+};{{/isEnum}}
 {{/model}}
 {{/models}}
 
